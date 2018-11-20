@@ -1,0 +1,114 @@
+/*
+＊コマンド例
+	!dir /b
+	varren3.mac
+*/
+
+call Main;
+endmacro;
+
+Main:
+	call LoadDengakuDll;
+	if(! ##return){
+		return ;
+	}
+	//debuginfo 1;
+	execmacro currentmacrodirectory+"\\command-line-internal\\input-keys.mac";
+	$$key_buffer=getresultex(-1);
+	//debuginfo "$$key_buffer="+$$key_buffer;
+	if($$key_buffer==""){
+		return;
+	}
+	
+	if(leftstr($$key_buffer,1)=="!"){
+		//シェル実行
+		call RunShell $$key_buffer;
+	}else{
+		//通常コマンド
+		call RunHidemaruCommand $$key_buffer;
+	}
+	return;
+
+RunShell:
+	//!を取り除く
+	$$command=midstr($$1,1);
+	runex "cmd.exe /c "+$$command
+			, 0 			//sync	  0:async 1:sync
+			, 0, "" 		//stdin   0:none 1:auto 2:file 3:(reserve) 4:all 5:select
+			, 1, "" 		//stdout  0:none 1:auto 2:file 3:add file  4:new 5:insert 6:replace
+			, 1, "" 		//stderr  0:none 1:=out 2:file 3:add file  4:new 5:insert 6:replace
+			, 1, "" 		//folder  0:none 1:current 2:specify 3:(reserve) 4:exe's folder
+			, 2 			//show	  0:auto 1:show 2:hide
+			, 1 			//nodraw  0:draw 1:no draw
+			, 0 			//unicode 0:ansi 2:unicode
+			;
+	return ;
+
+RunHidemaruCommand:
+	//todo: 空白区切りは文字列を解析できないのでよくない。
+	//		（例）hoge.mac 1 2 "a b c";
+	call Tokenize, $$1, " ";
+	//call DumpToken;
+	if(#g_token_num==0){
+		return ;
+	}
+	$$command = $g_token[0];
+	//マクロディレクトリからファイルを探す
+	$$abs_filename=macrodir+"\\"+$$1;
+	if(existfile($$abs_filename)){
+		execmacro $$abs_filename;
+		return ;
+	}
+	
+	//ファイルが無ければ秀丸のコマンドとして実行する
+	eval($$1);
+	return ;
+	
+
+/*
+＊引数
+	$$1 対象文字列
+	$$2 セパレータ
+
+＊返値
+	#g_token_num	トークン数
+	$g_token[]		トークンの配列
+*/
+Tokenize:
+	#g_token_num=0;
+	$$token = dllfuncstr("GETTOKEN",$$1,$$2);
+	while (true) {
+		if($$token==""){
+			return;
+		}
+		$g_token[#g_token_num] = $$token;
+		#g_token_num = #g_token_num + 1;
+	    if (dllfunc("HASMORETOKENS") == 0) {
+			return;
+		}
+	    $$token = dllfuncstr("GETTOKEN","",$$2);
+	}
+	return;
+
+
+DumpToken:
+	debuginfo "==== DumpToken ====";
+	##i=0;
+	while(##i<#g_token_num){
+		debuginfo "["+str(##i)+"]"+$g_token[##i];
+		##i = ##i + 1;
+	}
+	return ;
+
+
+LoadDengakuDll:
+	loaddll macrodir + "\\DengakuDLL.dll";
+	if (result) {
+		return true;
+	}
+	loaddll hidemarudir + "\\DengakuDLL.dll";
+	if (result) {
+		return true;
+	}
+	message "田楽DLLのロードに失敗しました\n" + "DengakuDLL.dllが秀丸マクロディレクトリに存在するか確認してください";
+	return false;
