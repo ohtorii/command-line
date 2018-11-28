@@ -2,32 +2,59 @@
 ＊コマンド例
 	!dir /b
 	varren3.mac
+	message("Hello world.")
 */
+
+#g_open_newfile = false;
+#g_new_hidemaru = 0;
+#g_old_hidemaru = hidemaruhandle(0);
 
 call Main;
 endmacro;
 
+
+
 Main:
+	call NewfileIfExist;
+	if(##return==false){
+		return false;
+	}
 	call LoadDengakuDll;
 	if(! ##return){
 		return ;
 	}
-	//debuginfo 1;
-	execmacro currentmacrodirectory+"\\command-line-internal\\input-keys.mac";
-	$$key_buffer=getresultex(-1);
-	//debuginfo "$$key_buffer="+$$key_buffer;
-	if($$key_buffer==""){
-		return;
-	}
-	
-	if(leftstr($$key_buffer,1)=="!"){
-		//シェル実行
-		call RunShell $$key_buffer;
-	}else{
-		//通常コマンド
-		call RunHidemaruCommand $$key_buffer;
+	call MainLoop;
+	clearupdated;
+	//if(! ##result)
+	{
+		call CloseFileIfOpen;
 	}
 	return;
+
+
+MainLoop:
+	while(true){
+		$$key_buffer="";
+		debuginfo 1;
+		debuginfo "call input-keys.mac";
+		execmacro currentmacrodirectory+"\\command-line-internal\\input-keys.mac", $$key_buffer;
+		$$key_buffer=getresultex(-1);
+		//debuginfo "$$key_buffer="+$$key_buffer;
+		if($$key_buffer==""){
+			return;
+		}
+		if(leftstr($$key_buffer,1)=="!"){
+			//シェル実行
+			debuginfo "runshell start";
+			call RunShell $$key_buffer;
+			debuginfo "runshell end";
+		}else{
+			//通常コマンド
+			call RunHidemaruCommand $$key_buffer;
+		}
+	}
+	return ;
+
 
 RunShell:
 	//!を取り除く
@@ -35,11 +62,11 @@ RunShell:
 	runex "cmd.exe /c "+$$command
 			, 0 			//sync	  0:async 1:sync
 			, 0, "" 		//stdin   0:none 1:auto 2:file 3:(reserve) 4:all 5:select
-			, 1, "" 		//stdout  0:none 1:auto 2:file 3:add file  4:new 5:insert 6:replace
-			, 1, "" 		//stderr  0:none 1:=out 2:file 3:add file  4:new 5:insert 6:replace
+			, 5, "" 		//stdout  0:none 1:auto 2:file 3:add file  4:new 5:insert 6:replace
+			, 5, "" 		//stderr  0:none 1:=out 2:file 3:add file  4:new 5:insert 6:replace
 			, 1, "" 		//folder  0:none 1:current 2:specify 3:(reserve) 4:exe's folder
 			, 2 			//show	  0:auto 1:show 2:hide
-			, 1 			//nodraw  0:draw 1:no draw
+			, 0 			//nodraw  0:draw 1:no draw
 			, 0 			//unicode 0:ansi 2:unicode
 			;
 	return ;
@@ -115,6 +142,32 @@ DumpToken:
 	}
 	return ;
 
+
+NewfileIfExist:
+	#g_open_newfile = false;
+	if(filetype=="new"){
+		return true;
+	}
+	//編集中のテキストを上書きしないための対応。
+	//新規ファイルを作成しそこへコマンドの実行結果を出力する。
+	newfile;
+	if(result==0){
+		return false;
+	}
+	#g_open_newfile=true;
+	#g_new_hidemaru=hidemaruhandle(0);
+	return true;
+
+
+CloseFileIfOpen:
+	if(#g_open_newfile){
+		setactivehidemaru	#g_old_hidemaru;
+		closehidemaruforced #g_new_hidemaru;
+
+		#g_old_hidemaru=0;
+		#g_new_hidemaru=0;
+	}
+	return true;
 
 LoadDengakuDll:
 	loaddll macrodir + "\\DengakuDLL.dll";
