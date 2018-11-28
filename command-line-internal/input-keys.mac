@@ -21,13 +21,14 @@ $g_old_searchbuffer = searchbuffer;
 #g_old_hidemaru     = hidemaruhandle(0);
 
 //debuginfo "start";
+$g_keybuf=getarg(0);
 call Main;
-#g_result=#return;
+#g_result=##return;
 setsearch $g_old_searchbuffer, #g_old_searchoption;
 if(#g_result){
-	endmacro ;
-}else{
 	endmacro $g_keybuf;
+}else{
+	endmacro ;
 }
 
 
