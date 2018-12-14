@@ -49,7 +49,7 @@ MainLoop:
 			call RunShell $$key_buffer;
 			debuginfo "runshell end";
 		}else{
-			//通常コマンド
+			//秀丸マクロ or 秀丸マクロの関数
 			call RunHidemaruCommand $$key_buffer;
 		}
 	}
