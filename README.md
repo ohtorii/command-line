@@ -69,9 +69,3 @@ Bashと概ね同じです。
 <https://ohtorii.hatenadiary.jp/> <br>
 <https://twitter.com/ohtorii> <br>
 <https://github.com/ohtorii>
-
-# 謝辞
-
-かなり参考にしています😐	<br>
-[unite.vim](https://github.com/Shougo/unite.vim)		<br>
-[anything.el](http://emacs.rubikitch.com/anything/)
