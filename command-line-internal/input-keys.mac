@@ -71,7 +71,11 @@ Process:
 			##ctrl=iskeydown(#K_CTRL);
 			##alt=iskeydown(#K_ALT);
 		}else{
-			##in = inputchar("",0);
+			if(888<=version){
+				##in = inputchar("",0);
+			}else{
+				##in = inputchar("");
+			}
 		}
 		
 		if ((0x20<=##in) && (##in<=0x7e)) call _Addchar char(##in);
