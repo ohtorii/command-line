@@ -4,6 +4,7 @@
 
 # スクリーンショット
 
+左下の**ステータスバー**に注目して下さい。
 ![秀丸エディタのコマンドライン](image/basic.gif "秀丸エディタのコマンドライン")
 
 # 機能
@@ -58,15 +59,18 @@ Bashと概ね同じです。
 |:--:|:--:|:--:|
 |直前の文字とその前の文字を入れ替える|Ctrl-t||
 
-
-
 # その他
-
-- VIMに触発されてなんとなく作ってみましたが、コマンド補完が効かないので微妙に使いにくいです。
-- 他のマクロに組み込んで使うことを目的として開発しています。
+- 別件でVIMの[unite.vim](https://github.com/Shougo/unite.vim)を秀丸エディタに移植してまして・・・このマクロは副産物です。(denite.nvimだろっ！という突っ込みは無しでお願いしますね😙)
+- 他のマクロに組み込んで使うことを目的としています。
 
 # 連絡先
 
 <https://ohtorii.hatenadiary.jp/> <br>
 <https://twitter.com/ohtorii> <br>
 <https://github.com/ohtorii>
+
+# 謝辞
+
+かなり参考にしています😐	<br>
+[unite.vim](https://github.com/Shougo/unite.vim)		<br>
+[anything.el](http://emacs.rubikitch.com/anything/)
