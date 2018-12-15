@@ -1,20 +1,26 @@
-ï»¿/*ã‚³ãƒãƒ³ãƒ‰å…¥åŠ›å‡¦ç†
+/*ƒRƒ}ƒ“ƒh“ü—Íˆ—
 
-è¿”å€¤	keybord_buffer
+usage:
+  input-keys.mac key_buffer cursor_pos
 
-		format:
-			status key_buffer
-			
-			status	"0"		é€šå¸¸ã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã€åˆã¯ã‚­ãƒ¼å…¥åŠ›ã®ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆç™ºç”Ÿ
-					"1"		EnterãŒæŠ¼ã•ã‚ŒãŸ
-					"2"		EscapeãŒæŠ¼ã•ã‚ŒãŸ
+result:
+  return keyboard_buffer
 
-			key_buffer	ã‚­ãƒ¼å…¥åŠ›ã®æ–‡å­—åˆ—
+  format:
+    status cursor_pos key_buffer
+    
+    status  "0"    ’ÊíƒL[‚ª‰Ÿ‚³‚ê‚½A–”‚ÍƒL[“ü—Í‚Ìƒ^ƒCƒ€ƒAƒEƒg”­¶
+            "1"    Enter‚ª‰Ÿ‚³‚ê‚½
+            "2"    Escape‚ª‰Ÿ‚³‚ê‚½
+    
+    cursor_pos     ƒJ[ƒ\ƒ‹ˆÊ’u(4Œ…‚Ì10i”)
+    
+    key_buffer  ƒL[“ü—Í‚Ì•¶š—ñ
 
-		example:
-			"0!dir"
-			"1!dir /b"
-			"2messa"
+  example:
+    "00004!dir"
+    "10007!dir /b"
+    "20006messa"
 */
 
 disablebreak;
@@ -22,36 +28,37 @@ disablebreak;
 $g_keybuf		="";
 #g_cursor_pos	=0;
 $g_cursor_char="|";
-//å˜èªå¢ƒç•Œ
+//’PŒê‹«ŠE
 $g_word_boundary=" ";
 
-//_SplitKeybufãƒ©ãƒ™ãƒ«ã®è¿”å€¤
+//_SplitKeybufƒ‰ƒxƒ‹‚Ì•Ô’l
 $g_temp_keybuf_left="";
 $g_temp_keybuf_right="";
 
 /*****************************************************************************
-	ãƒ¡ã‚¤ãƒ³å‡¦ç†
+	ƒƒCƒ“ˆ—
 *****************************************************************************/
 $g_old_searchbuffer = searchbuffer;
 #g_old_searchoption = searchoption;
 #g_old_hidemaru     = hidemaruhandle(0);
 
 $g_keybuf=getarg(0);
+#g_cursor_pos=val(getarg(1));
+
 call Main;
 #g_result=##return;
 setsearch $g_old_searchbuffer, #g_old_searchoption;
-if(#g_result){
-	endmacro str(#g_result)+$g_keybuf;
-}else{
-	endmacro ;
-}
+
+call FormatCursoPos #g_cursor_pos;
+endmacro str(#g_result) + $$return + $g_keybuf;
+
 
 
 
 /*
-è¿”å€¤ 	0  é€šå¸¸ã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã€åˆã¯ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆ
-		1  Enterã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸ
-		2  EscapeãŒæŠ¼ã•ã‚ŒãŸ
+•Ô’l 	0  ’ÊíƒL[‚ª‰Ÿ‚³‚ê‚½A–”‚Íƒ^ƒCƒ€ƒAƒEƒg
+		1  EnterƒL[‚ª‰Ÿ‚³‚ê‚½
+		2  Escape‚ª‰Ÿ‚³‚ê‚½
 */
 Main:
 	/*call Initialize;
@@ -67,23 +74,23 @@ Main:
 		}
 		
 		if ((0x20<=##in) && (##in<=0x7e)) call _Addchar char(##in);
-		//ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•
-		else if (##in == 0x1C)		call _Left; 	// [â†]
-		else if (##in == 0x1E)		call _Right;	// [â†’]
-		else if (##in == 0x1D)		call _Up;		// [â†‘]
-		else if (##in == 0x1F)		call _Down; 	//[â†“]
+		//ƒJ[ƒ\ƒ‹ˆÚ“®
+		else if (##in == 0x1C)		call _Left; 	// [©]
+		else if (##in == 0x1E)		call _Right;	// [¨]
+		else if (##in == 0x1D)		call _Up;		// [ª]
+		else if (##in == 0x1F)		call _Down; 	//[«]
 		else if (##in == 1) 		call _Home; 	// [Ctrl-a]
 		else if (##in == 5) 		call _End;		// [Ctrl-e]
 		else if (##in == 6) 		call _Right;	// [Ctrl-f]
 		else if (##in == 2) 		call _Left; 	// [Ctrl-b]
-		//else if (##in == )		call _KillWord; 	// [M-d]	Ã—	ãƒ¡ã‚¿ã‚­ãƒ¼(ALT)ã‚’èªè­˜ã—ãªã„
-		//else if (##in == )		call _ForwardWord;	// [M-f]	Ã—	ãƒ¡ã‚¿ã‚­ãƒ¼(ALT)ã‚’èªè­˜ã—ãªã„
-		//else if (##in == )		call _BackwardWord; // [M-b]	Ã—	ãƒ¡ã‚¿ã‚­ãƒ¼(ALT)ã‚’èªè­˜ã—ãªã„
+		//else if (##in == )		call _KillWord; 	// [M-d]	~	ƒƒ^ƒL[(ALT)‚ğ”F¯‚µ‚È‚¢
+		//else if (##in == )		call _ForwardWord;	// [M-f]	~	ƒƒ^ƒL[(ALT)‚ğ”F¯‚µ‚È‚¢
+		//else if (##in == )		call _BackwardWord; // [M-b]	~	ƒƒ^ƒL[(ALT)‚ğ”F¯‚µ‚È‚¢
 
-		//å±¥æ­´æ“ä½œ
+		//—š—ğ‘€ì
 		else if (##in == 16)		call _PreviousHistory;		// [Ctrl-p]
 		else if (##in == 18)		call _ReverseSearchHistory; // [Ctrl-r]
-		//ãƒ†ã‚­ã‚¹ãƒˆå‡¦ç†
+		//ƒeƒLƒXƒgˆ—
 		else if (##in == 4) 		call _Del;			// [Ctrl-d]
 		else if (##in == 20)		call _Transpose;	// [Ctrl-t]
 		else if (##in == 11)		call _KillLine; 	// [Ctrl-k]
@@ -91,13 +98,14 @@ Main:
 		else if (##in == 23)		call _WordRubout;	// [Ctrl-w]
 		else if (##in == 0x08)		call _Back; 		// [Backspace]
 		else if (##in == 0x7F)		call _Del;			// [Ctrl+Backspace]
-		else if (##in == 14)		call _Clear;		// [Ctrl-N]	å…¥åŠ›æ–‡å­—å…¨å‰Šé™¤
-		//ã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œ
+		else if (##in == 14)		call _Clear;		// [Ctrl-N]	“ü—Í•¶š‘Síœ
+		//ƒRƒ}ƒ“ƒhÀs
 		else if (##in == 10){		/*call _Return;*/	return 1;}	// c-j
 		else if (##in == 13){		/*call _Return;*/	return 1;}	// Enter,c-m
-		//ãã®ä»–
+		//‚»‚Ì‘¼
 		else if (##in == 3){		/*call _Exit;*/ 	return 2;}	// ctrl-c
 		else if (##in == 0x1B){ 	/*call _Escape;*/	return 2;}	// [Esc]
+		call _Show;
 	}
 	return 0;
 
@@ -138,8 +146,8 @@ _Del:
 	$g_keybuf = $g_temp_keybuf_left + $$right;
 	return true;
 
-//ã‚«ãƒ¼ã‚½ãƒ«å‰å¾Œã®æ–‡å­—ã‚’å…¥ã‚Œæ›¿ãˆã‚‹ã€‚
-//ã‚«ãƒ¼ã‚½ãƒ«ãŒè¡Œæœ«ã«ã‚ã‚‹å ´åˆã¯æœ€å¾Œã®2æ–‡å­—ã‚’å…¥ã‚Œæ›¿ãˆã‚‹ã€‚
+//ƒJ[ƒ\ƒ‹‘OŒã‚Ì•¶š‚ğ“ü‚ê‘Ö‚¦‚éB
+//ƒJ[ƒ\ƒ‹‚ªs––‚É‚ ‚éê‡‚ÍÅŒã‚Ì2•¶š‚ğ“ü‚ê‘Ö‚¦‚éB
 _Transpose:
 	if(#g_cursor_pos<=0){
 		return true;
@@ -149,7 +157,7 @@ _Transpose:
 		return true;
 	}
 	if(##len <= #g_cursor_pos){
-		//ã‚«ãƒ¼ã‚½ãƒ«ãŒè¡Œæœ«ã«ã‚ã‚‹ã®ã§æœ€å¾Œã®ï¼’æ–‡å­—ã‚’å…¥ã‚Œæ›¿ãˆã‚‹ã€‚
+		//ƒJ[ƒ\ƒ‹‚ªs––‚É‚ ‚é‚Ì‚ÅÅŒã‚Ì‚Q•¶š‚ğ“ü‚ê‘Ö‚¦‚éB
 		##last_index=##len-1;
 		$$last_char0=midstr($g_keybuf,##last_index,1);
 		$$last_char1=midstr($g_keybuf,##last_index-1,1);
@@ -164,19 +172,19 @@ _Transpose:
 	#g_cursor_pos=#g_cursor_pos+1;
 	return true;
 
-//è¡Œæœ«ã¾ã§å‰Šé™¤
+//s––‚Ü‚Åíœ
 _KillLine:
 	$g_keybuf=leftstr($g_keybuf,#g_cursor_pos);
 	return true;
 
-//è¡Œé ­ã¾ã§å‰Šé™¤
+//s“ª‚Ü‚Åíœ
 _LineDiscard:
 	##len=strlen($g_keybuf);
 	$g_keybuf=rightstr($g_keybuf,##len-#g_cursor_pos);
 	#g_cursor_pos=0;
 	return true;
 
-//ç›´å¾Œã®ä¸€å˜èªã‚’å‰Šé™¤
+//’¼Œã‚Ìˆê’PŒê‚ğíœ
 _KillWord:
 	call _FindForwardWord;
 	##word_end_index=##return;
@@ -184,10 +192,10 @@ _KillWord:
 		return true;
 	}
 	$g_keybuf=leftstr($g_keybuf,#g_cursor_pos)+midstr($g_keybuf,##word_end_index);
-	//memo:ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã¯å¤‰ã‚ã‚‰ãªã„ã€‚
+	//memo:ƒJ[ƒ\ƒ‹ˆÊ’u‚Í•Ï‚í‚ç‚È‚¢B
 	return true;
 
-//ç›´å‰ã®ä¸€å˜èªã‚’å‰Šé™¤
+//’¼‘O‚Ìˆê’PŒê‚ğíœ
 _WordRubout:
 	call _FindBackWord;
 	##word_start_index=##return;
@@ -242,7 +250,7 @@ _Up:
 _Down:
 	return true;
 
-//æ¬¡ã®å˜èªã«ç§»å‹•
+//Ÿ‚Ì’PŒê‚ÉˆÚ“®
 _ForwardWord:
 	call _FindForwardWord;
 	##word_end_index=##return;
@@ -252,7 +260,7 @@ _ForwardWord:
 	#g_cursor_pos=##word_end_index;
 	return true;
 
-//å‰ã®å˜èªã«ç§»å‹•
+//‘O‚Ì’PŒê‚ÉˆÚ“®
 _BackwardWord:
 	call _FindBackWord;
 	##word_start_index=##return;
@@ -262,13 +270,13 @@ _BackwardWord:
 	#g_cursor_pos=##word_start_index;
 	return true;
 
-//æ¬¡ã®å˜èªã‚’ä½ç½®ã‚’æ¢ã™
+//Ÿ‚Ì’PŒê‚ğˆÊ’u‚ğ’T‚·
 _FindForwardWord:
 	##len=strlen($g_keybuf);
 	if(#g_cursor_pos==##len){
 		return -1;
 	}
-	//å˜èªã®é–‹å§‹ä½ç½®ã‚’æ¢ã™ï¼ˆã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®ç©ºç™½ã‚’å¾Œæ–¹ã«å‘ã‹ã£ã¦èª­ã¿é£›ã°ã™ï¼‰
+	//’PŒê‚ÌŠJnˆÊ’u‚ğ’T‚·iƒJ[ƒ\ƒ‹ˆÊ’u‚Ì‹ó”’‚ğŒã•û‚ÉŒü‚©‚Á‚Ä“Ç‚İ”ò‚Î‚·j
 	##word_start_index=#g_cursor_pos;
 	while(true){
 		if(##word_start_index==##len){
@@ -281,18 +289,18 @@ _FindForwardWord:
 	}
 	##word_end_index=strstr($g_keybuf,$g_word_boundary,##word_start_index);
 	if(##word_end_index==-1){
-		//æœ€å¾Œã¾ã§å‰Šé™¤å¯¾è±¡ã¨ã™ã‚‹
+		//ÅŒã‚Ü‚Åíœ‘ÎÛ‚Æ‚·‚é
 		##word_end_index=##len-1;
 	}
 	return ##word_end_index;
 
 
-//å‰ã®å˜èªä½ç½®ã‚’æ¢ã™
+//‘O‚Ì’PŒêˆÊ’u‚ğ’T‚·
 _FindBackWord:
 	if(#g_cursor_pos==0){
 		return -1;
 	}
-	//å˜èªã®çµ‚äº†ä½ç½®ã‚’æ¢ã™ï¼ˆã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®ç©ºç™½ã‚’å…ˆé ­ã«å‘ã‹ã£ã¦èª­ã¿é£›ã°ã™ï¼‰
+	//’PŒê‚ÌI—¹ˆÊ’u‚ğ’T‚·iƒJ[ƒ\ƒ‹ˆÊ’u‚Ì‹ó”’‚ğæ“ª‚ÉŒü‚©‚Á‚Ä“Ç‚İ”ò‚Î‚·j
 	##word_end_index=#g_cursor_pos - 1;
 	while(true){
 		if(##word_end_index==0){
@@ -305,10 +313,10 @@ _FindBackWord:
 	}
 	##word_start_index=strrstr($g_keybuf,$g_word_boundary,##word_end_index);
 	if(##word_start_index==-1){
-		//å…ˆé ­ã‹ã‚‰å‰Šé™¤ã™ã‚‹
+		//æ“ª‚©‚çíœ‚·‚é
 		##word_start_index=0;
 	}else{
-		//ç©ºç™½æ–‡å­—ã®ç›´å‰ã¾ã§ã‚’å‰Šé™¤å¯¾è±¡ã«ã™ã‚‹
+		//‹ó”’•¶š‚Ì’¼‘O‚Ü‚Å‚ğíœ‘ÎÛ‚É‚·‚é
 		##word_start_index=##word_start_index+1;
 	}
 	return ##word_start_index;
@@ -323,3 +331,25 @@ _SplitKeybuf:
 	$g_temp_keybuf_left=leftstr($g_keybuf,#g_cursor_pos);
 	$g_temp_keybuf_right=rightstr($g_keybuf,##len-#g_cursor_pos);
 	return ##len;
+
+//”’l‚ğ4Œ…‹æØ‚è‚Ì•¶š—ñ‚É‚·‚é
+FormatCursoPos:
+	$$v=str(##1);
+	##len=strlen($$v);
+	if(##len==0){
+		return "0000";
+	}
+	if(##len==1){
+		return "000"+$$v;
+	}
+	if(##len==2){
+		return "00"+$$v;
+	}
+	if(##len==3){
+		return "0"+$$v;
+	}
+	if(##len==4){
+		return $$v;
+	}
+	//‚Æ‚è‚ ‚¦‚¸0‚ğ•Ô‚·
+	return "0000";

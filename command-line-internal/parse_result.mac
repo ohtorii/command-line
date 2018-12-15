@@ -1,0 +1,38 @@
+﻿/* input-keys.mac の返値をパースする。
+
+usage:
+  parse_result.mac mode keybord_buffer
+
+  mode:
+    status		ステータスを返す
+    cursor		カーソル位置を帰す
+    keybuffer	キー入力文字列を返す
+    
+  example:
+    $ parse_result.mac status 10007!dir
+    1
+    
+    $ parse_result.mac cursor 10007!dir
+    7
+    
+    $ parse_result.mac keybuffer 10007!dir
+    !dir
+*/
+
+call main getarg(0), getarg(1);
+endmacro $$return;
+
+main:
+	$$mode=$$1;
+	$$arg=$$2;
+	if($$mode=="status"){
+		return leftstr($$arg,1);
+	}
+	if($$mode=="cursor"){
+		//"0009" -> "9"
+		return str(val(midstr($$arg,1,4)));
+	}
+	if($$mode=="keybuffer"){
+		return midstr($$arg,5);
+	}
+	return "";
