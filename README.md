@@ -12,7 +12,7 @@
 
 - 秀丸マクロの命令(insert,up,messageなど)を呼び出せます。
 - 先頭に!を付けるとVIMっぽくコマンドラインとして解釈します。(!dir, !set とか)
-- マクロを呼び出せます。（スクリーンショットでは[IKKI氏](http://mobitan.org/)作成の[varren3.mac](http://mobitan.org/hm/varren3/)を呼び出しています。）
+- 秀丸マクロを呼び出せます。（スクリーンショットでは[IKKI氏](http://mobitan.org/)作成の[varren3.mac](http://mobitan.org/hm/varren3/)を呼び出しています。）
 
 # コマンドラインの操作方法
 
