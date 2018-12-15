@@ -71,15 +71,15 @@ Process:
 			##ctrl=iskeydown(#K_CTRL);
 			##alt=iskeydown(#K_ALT);
 		}else{
-			##in = inputchar("");
+			##in = inputchar("",0);
 		}
 		
 		if ((0x20<=##in) && (##in<=0x7e)) call _Addchar char(##in);
 		//カーソル移動
 		else if (##in == 0x1C)		call _Left; 	// [←]
 		else if (##in == 0x1E)		call _Right;	// [→]
-		else if (##in == 0x1D)		call _Up;		// [↑]
-		else if (##in == 0x1F)		call _Down; 	//[↓]
+		//else if (##in == 0x1D)		call _Up;		// [↑]
+		//else if (##in == 0x1F)		call _Down; 	//[↓]
 		else if (##in == 1) 		call _Home; 	// [Ctrl-a]
 		else if (##in == 5) 		call _End;		// [Ctrl-e]
 		else if (##in == 6) 		call _Right;	// [Ctrl-f]
