@@ -1,5 +1,5 @@
-/*
-–ƒRƒ}ƒ“ƒh—á
+ï»¿/*
+ï¼Šã‚³ãƒãƒ³ãƒ‰ä¾‹
 	!dir /b
 	varren3.mac
 	message("Hello world.")
@@ -58,11 +58,11 @@ MainLoop:
 		if($$status=="0"){
 			/*pass*/
 		}else if($$status=="1"){
-			/*EnterƒL[‚ª‰Ÿ‚³‚ê‚½*/
+			/*Enterã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸ*/
 			call ProcessEnter $$key_buffer;
 			$$key_buffer="";
 		}else if($$status=="2"){
-			//Escape‚ª‰Ÿ‚³‚ê‚½
+			//EscapeãŒæŠ¼ã•ã‚ŒãŸ
 			return ;
 		}else{
 			/*pass*/
@@ -76,16 +76,16 @@ ProcessEnter:
 		return;
 	}
 	if(leftstr($$key_buffer,1)=="!"){
-		//ƒVƒFƒ‹Às
+		//ã‚·ã‚§ãƒ«å®Ÿè¡Œ
 		call RunShell $$key_buffer;
 	}else{
-		//GŠÛƒ}ƒNƒ or GŠÛƒ}ƒNƒ‚ÌŠÖ”
+		//ç§€ä¸¸ãƒã‚¯ãƒ­ or ç§€ä¸¸ãƒã‚¯ãƒ­ã®é–¢æ•°
 		call RunHidemaruCommand $$key_buffer;
 	}
 	return;
 
 RunShell:
-	//!‚ğæ‚èœ‚­
+	//!ã‚’å–ã‚Šé™¤ã
 	$$command=midstr($$1,1);
 	runex "cmd.exe /c "+$$command
 			, 0 			//sync	  0:async 1:sync
@@ -100,22 +100,22 @@ RunShell:
 	return ;
 
 RunHidemaruCommand:
-	//todo: ‹ó”’‹æØ‚è‚Í•¶š—ñ‚ğ‰ğÍ‚Å‚«‚È‚¢‚Ì‚Å‚æ‚­‚È‚¢B
-	//		i—ájhoge.mac 1 2 "a b c";
+	//todo: ç©ºç™½åŒºåˆ‡ã‚Šã¯æ–‡å­—åˆ—ã‚’è§£æã§ããªã„ã®ã§ã‚ˆããªã„ã€‚
+	//		ï¼ˆä¾‹ï¼‰hoge.mac 1 2 "a b c";
 	call Tokenize, $$1, " ";
 	//call DumpToken;
 	if(#g_token_num==0){
 		return ;
 	}
 	$$command = $g_token[0];
-	//ƒ}ƒNƒƒfƒBƒŒƒNƒgƒŠ‚©‚çƒtƒ@ƒCƒ‹‚ğ’T‚·
+	//ãƒã‚¯ãƒ­ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‹ã‚‰ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ¢ã™
 	$$abs_filename=macrodir+"\\"+$$command;
 	if(existfile($$abs_filename)){
 		call ExecMacro $$abs_filename;
 		return ;
 	}
 	
-	//ƒ}ƒNƒƒtƒ@ƒCƒ‹‚ª–³‚¯‚ê‚ÎGŠÛ‚ÌƒRƒ}ƒ“ƒh‚Æ‚µ‚ÄÀs‚·‚é
+	//ãƒã‚¯ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ãŒç„¡ã‘ã‚Œã°ç§€ä¸¸ã®ã‚³ãƒãƒ³ãƒ‰ã¨ã—ã¦å®Ÿè¡Œã™ã‚‹
 	eval($$1);
 	return ;
 	
@@ -136,13 +136,13 @@ ExecMacro:
 	}
 	return ;
 /*
-–ˆø”
-	$$1 ‘ÎÛ•¶š—ñ
-	$$2 ƒZƒpƒŒ[ƒ^
+ï¼Šå¼•æ•°
+	$$1 å¯¾è±¡æ–‡å­—åˆ—
+	$$2 ã‚»ãƒ‘ãƒ¬ãƒ¼ã‚¿
 
-–•Ô’l
-	#g_token_num	ƒg[ƒNƒ“”
-	$g_token[]		ƒg[ƒNƒ“‚Ì”z—ñ
+ï¼Šè¿”å€¤
+	#g_token_num	ãƒˆãƒ¼ã‚¯ãƒ³æ•°
+	$g_token[]		ãƒˆãƒ¼ã‚¯ãƒ³ã®é…åˆ—
 */
 Tokenize:
 	#g_token_num=0;
@@ -176,8 +176,8 @@ NewfileIfExist:
 	if(filetype=="new"){
 		return true;
 	}
-	//•ÒW’†‚ÌƒeƒLƒXƒg‚ğã‘‚«‚µ‚È‚¢‚½‚ß‚Ì‘Î‰B
-	//V‹Kƒtƒ@ƒCƒ‹‚ğì¬‚µ‚»‚±‚ÖƒRƒ}ƒ“ƒh‚ÌÀsŒ‹‰Ê‚ğo—Í‚·‚éB
+	//ç·¨é›†ä¸­ã®ãƒ†ã‚­ã‚¹ãƒˆã‚’ä¸Šæ›¸ãã—ãªã„ãŸã‚ã®å¯¾å¿œã€‚
+	//æ–°è¦ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã—ãã“ã¸ã‚³ãƒãƒ³ãƒ‰ã®å®Ÿè¡Œçµæœã‚’å‡ºåŠ›ã™ã‚‹ã€‚
 	newfile;
 	if(result==0){
 		return false;
@@ -206,5 +206,5 @@ LoadDengakuDll:
 	if (result) {
 		return true;
 	}
-	message "“cŠyDLL‚Ìƒ[ƒh‚É¸”s‚µ‚Ü‚µ‚½\n" + "DengakuDLL.dll‚ªGŠÛƒ}ƒNƒƒfƒBƒŒƒNƒgƒŠ‚É‘¶İ‚·‚é‚©Šm”F‚µ‚Ä‚­‚¾‚³‚¢";
+	message "ç”°æ¥½DLLã®ãƒ­ãƒ¼ãƒ‰ã«å¤±æ•—ã—ã¾ã—ãŸ\n" + "DengakuDLL.dllãŒç§€ä¸¸ãƒã‚¯ãƒ­ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«å­˜åœ¨ã™ã‚‹ã‹ç¢ºèªã—ã¦ãã ã•ã„";
 	return false;
