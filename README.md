@@ -61,7 +61,7 @@ Bashと概ね同じです。
 |直前の文字とその前の文字を入れ替える|Ctrl-t||
 
 # その他
-- 別件でVIMの[unite.vim](https://github.com/Shougo/unite.vim)を秀丸エディタに移植してまして・・・このマクロは副産物です。(denite.nvimだろっ！という突っ込みは無しでお願いしますね😙)
+- 別件でVIMの[unite.vim](https://github.com/Shougo/unite.vim)を秀丸エディタに移植してまして・・・このマクロは**副産物**です。(時代は[denite.nvim](https://github.com/Shougo/denite.nvim)だろっ！という突っ込みは無しでお願いしますね😙)
 - 他のマクロに組み込んで使うことを目的としています。
 
 # 連絡先
