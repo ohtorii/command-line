@@ -4,18 +4,18 @@ usage:
   parse_result.mac mode keybord_buffer
 
   mode:
-    status		ステータスを返す
-    cursor		カーソル位置を帰す
-    keybuffer	キー入力文字列を返す
+    keycode		キーコード
+    cursor		カーソル位置
+    keybuffer	キー入力文字列
     
   example:
-    $ parse_result.mac status 10007!dir
-    1
+    $ parse_result.mac keycode 00820004!dir
+    82
     
-    $ parse_result.mac cursor 10007!dir
-    7
+    $ parse_result.mac cursor 00820004!dir
+    4
     
-    $ parse_result.mac keybuffer 10007!dir
+    $ parse_result.mac keybuffer 00820004!dir
     !dir
 */
 
@@ -25,14 +25,15 @@ endmacro $$return;
 main:
 	$$mode=$$1;
 	$$arg=$$2;
-	if($$mode=="status"){
-		return leftstr($$arg,1);
+	if($$mode=="keycode"){
+		//"0082" -> "82"
+		return str(val(leftstr($$arg,4)));
 	}
 	if($$mode=="cursor"){
 		//"0009" -> "9"
-		return str(val(midstr($$arg,1,4)));
+		return str(val(midstr($$arg,4,4)));
 	}
 	if($$mode=="keybuffer"){
-		return midstr($$arg,5);
+		return midstr($$arg,8);
 	}
 	return "";

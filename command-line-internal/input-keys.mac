@@ -7,20 +7,16 @@ result:
   return keyboard_buffer
 
   format:
-    status cursor_pos key_buffer
+    keycode cursor_pos key_buffer
     
-    status  "0"    通常キーが押された、又はキー入力のタイムアウト発生
-            "1"    Enterが押された
-            "2"    Escapeが押された
-    
-    cursor_pos     カーソル位置(4桁の10進数)
-    
+    keycode     inputcharで入力された値 (4桁の10進数)
+    cursor_pos  カーソル位置            (4桁の10進数)
     key_buffer  キー入力の文字列
 
   example:
-    "00004!dir"
-    "10007!dir /b"
-    "20006messa"
+    "00820004!dir"
+    "00660007!dir /b"
+    "00650006messa"
 */
 
 disablebreak;
@@ -46,21 +42,26 @@ $g_keybuf=getarg(0);
 #g_cursor_pos=val(getarg(1));
 
 call Main;
-#g_result=##return;
+$g_result=$$return;
 setsearch $g_old_searchbuffer, #g_old_searchoption;
-
-call FormatCursoPos #g_cursor_pos;
-endmacro str(#g_result) + $$return + $g_keybuf;
-
+endmacro $g_result;
 
 
 
 /*
-返値 	0  通常キーが押された、又はタイムアウト
-		1  Enterキーが押された
-		2  Escapeが押された
+返値 	inputcharで入力されたキーコード
 */
 Main:
+	call Process;
+	##keycode=##return;
+	call ConvertNumericTo4DigitDelimitedString ##keycode;
+	$$keycode_str=$$return;
+	call ConvertNumericTo4DigitDelimitedString #g_cursor_pos;
+	$$cursor_str=$$return;
+	return $$keycode_str + $$cursor_str + $g_keybuf;
+	
+Process:
+	##in=0;
 	/*call Initialize;
 	while(##return)*/
 	{
@@ -100,14 +101,14 @@ Main:
 		else if (##in == 0x7F)		call _Del;			// [Ctrl+Backspace]
 		else if (##in == 14)		call _Clear;		// [Ctrl-N]	入力文字全削除
 		//コマンド実行
-		else if (##in == 10){		/*call _Return;*/	return 1;}	// c-j
-		else if (##in == 13){		/*call _Return;*/	return 1;}	// Enter,c-m
+		//else if (##in == 10){		/*call _Return;*/	return 1;}	// c-j
+		else if (##in == 13){		/*call _Return;*/}	// Enter,c-m
 		//その他
-		else if (##in == 3){		/*call _Exit;*/ 	return 2;}	// ctrl-c
-		else if (##in == 0x1B){ 	/*call _Escape;*/	return 2;}	// [Esc]
+		else if (##in == 3){		/*call _Exit;*/  }	// ctrl-c
+		else if (##in == 0x1B){ 	/*call _Escape;*/}	// [Esc]
 		call _Show;
 	}
-	return 0;
+	return ##in;
 
 
 
@@ -333,7 +334,7 @@ _SplitKeybuf:
 	return ##len;
 
 //数値を4桁区切りの文字列にする
-FormatCursoPos:
+ConvertNumericTo4DigitDelimitedString:
 	$$v=str(##1);
 	##len=strlen($$v);
 	if(##len==0){

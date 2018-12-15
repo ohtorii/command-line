@@ -40,20 +40,18 @@ MainLoop:
 		execmacro currentmacrodirectory+"\\command-line-internal\\input-keys.mac", $$key_buffer,$$cursor_pos;
 		$$keybord_buffer=getresultex(-1);
 		
-		execmacro currentmacrodirectory+"\\command-line-internal\\parse_result.mac" , "status"		, $$keybord_buffer;
-		$$status=getresultex(-1);
+		execmacro currentmacrodirectory+"\\command-line-internal\\parse_result.mac" , "keycode"		, $$keybord_buffer;
+		$$keycode=getresultex(-1);
 		execmacro currentmacrodirectory+"\\command-line-internal\\parse_result.mac" , "cursor"		, $$keybord_buffer;
 		$$cursor_pos=getresultex(-1);
 		execmacro currentmacrodirectory+"\\command-line-internal\\parse_result.mac" , "keybuffer"	, $$keybord_buffer;
 		$$key_buffer=getresultex(-1);
 
-		if($$status=="0"){
-			/*pass*/
-		}else if($$status=="1"){
+		if($$keycode=="13"){
 			/*Enterキーが押された*/
 			call ProcessEnter $$key_buffer;
 			$$key_buffer="";
-		}else if($$status=="2"){
+		}else if($$keycode=="27"){
 			//Escapeが押された
 			return ;
 		}else{
