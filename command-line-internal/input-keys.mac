@@ -17,6 +17,9 @@ result:
     "00820004!dir"
     "00660007!dir /b"
     "00650006messa"
+
+備考:
+	キー入力が無いときは keycode="0" となる。
 */
 
 disablebreak;
