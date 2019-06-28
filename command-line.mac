@@ -8,6 +8,7 @@
 #g_open_newfile = false;
 #g_new_hidemaru = 0;
 #g_old_hidemaru = hidemaruhandle(0);
+#g_dll_dengaku  = 0;
 
 disablebreak;
 call Main;
@@ -25,6 +26,7 @@ Main:
 		return ;
 	}
 	call MainLoop;
+	call UnloadDengakuDll;
 	clearupdated;
 	//if(! ##result)
 	{
@@ -39,7 +41,7 @@ MainLoop:
 	while(true){
 		execmacro currentmacrodirectory+"\\command-line-internal\\input-keys.mac", $$key_buffer,$$cursor_pos;
 		$$keybord_buffer=getresultex(-1);
-		
+
 		execmacro currentmacrodirectory+"\\command-line-internal\\parse_result.mac" , "keycode"		, $$keybord_buffer;
 		$$keycode=getresultex(-1);
 		execmacro currentmacrodirectory+"\\command-line-internal\\parse_result.mac" , "cursor"		, $$keybord_buffer;
@@ -104,11 +106,11 @@ RunHidemaruCommand:
 		call ExecMacro $$abs_filename;
 		return ;
 	}
-	
+
 	//マクロファイルが無ければ秀丸のコマンドとして実行する
 	eval($$1);
 	return ;
-	
+
 ExecMacro:
 	$$abs_filename=$$1;
 	if(#g_token_num==1){
@@ -136,17 +138,17 @@ ExecMacro:
 */
 Tokenize:
 	#g_token_num=0;
-	$$token = dllfuncstr("GETTOKEN",$$1,$$2);
+	$$token = dllfuncstr(#g_dll_dengaku,"GETTOKEN",$$1,$$2);
 	while (true) {
 		if($$token==""){
 			return;
 		}
 		$g_token[#g_token_num] = $$token;
 		#g_token_num = #g_token_num + 1;
-	    if (dllfunc("HASMORETOKENS") == 0) {
+	    if (dllfunc(#g_dll_dengaku,"HASMORETOKENS") == 0) {
 			return;
 		}
-	    $$token = dllfuncstr("GETTOKEN","",$$2);
+	    $$token = dllfuncstr(#g_dll_dengaku,"GETTOKEN","",$$2);
 	}
 	return;
 
@@ -188,13 +190,22 @@ CloseFileIfOpen:
 	return true;
 
 LoadDengakuDll:
-	loaddll macrodir + "\\DengakuDLL.dll";
-	if (result) {
+	if(#g_dll_dengaku!=0){
 		return true;
 	}
-	loaddll hidemarudir + "\\DengakuDLL.dll";
-	if (result) {
+	#g_dll_dengaku=loaddll(macrodir + "\\DengakuDLL.dll");
+	if (#g_dll_dengaku!=0) {
+		return true;
+	}
+	#g_dll_dengaku=loaddll(hidemarudir + "\\DengakuDLL.dll");
+	if (#g_dll_dengaku!=0) {
 		return true;
 	}
 	message "田楽DLLのロードに失敗しました\n" + "DengakuDLL.dllが秀丸マクロディレクトリに存在するか確認してください";
 	return false;
+
+UnloadDengakuDll:
+	if(#g_dll_dengaku!=0){
+		freedll #g_dll_dengaku;
+	}
+	return ;
