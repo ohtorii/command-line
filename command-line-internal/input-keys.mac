@@ -8,7 +8,7 @@ result:
 
   format:
     keycode cursor_pos key_buffer
-    
+
     keycode     inputcharで入力された値 (4桁の10進数)
     cursor_pos  カーソル位置            (4桁の10進数)
     key_buffer  キー入力の文字列
@@ -39,7 +39,6 @@ $g_temp_keybuf_right="";
 *****************************************************************************/
 $g_old_searchbuffer = searchbuffer;
 #g_old_searchoption = searchoption;
-#g_old_hidemaru     = hidemaruhandle(0);
 
 $g_keybuf=getarg(0);
 #g_cursor_pos=val(getarg(1));
@@ -62,7 +61,7 @@ Main:
 	call ConvertNumericTo4DigitDelimitedString #g_cursor_pos;
 	$$cursor_str=$$return;
 	return $$keycode_str + $$cursor_str + $g_keybuf;
-	
+
 Process:
 	##in=0;
 	/*call Initialize;
@@ -79,8 +78,8 @@ Process:
 			debuginfo 1;
 			debuginfo str(##in);
 		}*/
-		
-		if ((!##ctrl) && (0x20<=##in) && (##in<=0x7e)){ 
+
+		if ((!##ctrl) && (0x20<=##in) && (##in<=0x7e)){
 			//memo: 「ctrl+アルファベット記号」が押下されているときは無視する。
 			call _Addchar char(##in);
 		}
@@ -100,7 +99,7 @@ Process:
 		//履歴操作(後で実装)
 		//else if (##in == 16)		call _PreviousHistory;		// [Ctrl-p]
 		//else if (##in == 18)		call _ReverseSearchHistory; // [Ctrl-r]
-		
+
 		//テキスト処理
 		else if (##in == 4) 		call _Del;			// [Ctrl-d]
 		else if (##in == 20)		call _Transpose;	// [Ctrl-t]
@@ -109,11 +108,11 @@ Process:
 		else if (##in == 23)		call _WordRubout;	// [Ctrl-w]
 		else if (##in == 0x08)		call _Back; 		// [Backspace]
 		else if (##in == 0x7F)		call _Del;			// [Ctrl+Backspace]
-		
+
 		//入力文字全削除
 		// ctrl-p ctrl-nの組み合わせで利用したいので何もしない
-		//else if (##in == 14)		call _Clear;		// [Ctrl-N]	
-		
+		//else if (##in == 14)		call _Clear;		// [Ctrl-N]
+
 		//コマンド実行
 		//else if (##in == 10){		/*call _Return;*/	return 1;}	// c-j
 		else if (##in == 13){		/*call _Return;*/}	// Enter,c-m
