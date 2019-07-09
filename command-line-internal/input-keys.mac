@@ -337,7 +337,14 @@ _FindBackWord:
 
 _Show:
 	call _SplitKeybuf;
-	title $g_temp_keybuf_left + $g_cursor_char + $g_temp_keybuf_right, 1;
+
+	/* Memo
+	0 = キャプションの設定
+	1 = ステータスバーの設定
+	2 = 見出しバーの設定
+	3 = タブモードのタブ名の設定
+	*/
+	title $g_temp_keybuf_left + $g_cursor_char + $g_temp_keybuf_right, 2;
 	return true;
 
 _SplitKeybuf:
