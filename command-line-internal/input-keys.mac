@@ -9,7 +9,7 @@ result:
   format:
     keycode cursor_pos key_buffer
 
-    keycode     inputcharで入力された値 (4桁の10進数)
+    keycode     keypressedex関数で入力された値 (4桁の10進数)
     cursor_pos  カーソル位置            (4桁の10進数)
     key_buffer  キー入力の文字列
 
