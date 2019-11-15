@@ -166,6 +166,8 @@ DumpToken:
 NewfileIfExist:
 	#g_open_newfile = false;
 	if(filetype=="new"){
+		/*見出しバー表示*/
+		config "xOutlineBar:1";
 		return true;
 	}
 	//編集中のテキストを上書きしないための対応。
@@ -176,6 +178,8 @@ NewfileIfExist:
 	}
 	#g_open_newfile=true;
 	#g_new_hidemaru=hidemaruhandle(0);
+	/*見出しバー表示*/
+	config "xOutlineBar:1";
 	return true;
 
 
