@@ -106,7 +106,7 @@ Process:
 		else if (##in == 11)		call _KillLine; 	// [Ctrl-k]
 		else if (##in == 21)		call _LineDiscard;	// [Ctrl-u]
 		else if (##in == 23)		call _WordRubout;	// [Ctrl-w]
-		else if (##in == 0x08)		call _Back; 		// [Backspace]
+		else if (##in == 0x08)		call _Back; 		// [Backspace | ctrl+h]
 		else if (##in == 0x7F)		call _Del;			// [Ctrl+Backspace]
 
 		//入力文字全削除
