@@ -34,6 +34,11 @@ $g_word_boundary=" ";
 $g_temp_keybuf_left="";
 $g_temp_keybuf_right="";
 
+/*キー入力の間隔(単位＝ミリ秒)
+(memo)定数は環境毎に調整する必要があるかも。
+*/
+#keyinput_interval = 80;
+
 /*****************************************************************************
 	メイン処理
 *****************************************************************************/
@@ -79,7 +84,18 @@ Process:
 			debuginfo str(##in);
 		}*/
 
-		if ((!##ctrl) && (0x20<=##in) && (##in<=0x7e)){
+		if(##in==0){
+			call _CheckKeyInputTiming;
+			if(##return){
+				if(iskeydown(0x24)){		//HOME
+					call _Home;
+				}else if(iskeydown(0x23)){	//END
+					call _End;
+				}else if(iskeydown(0x2E)){	//DEL
+					call _Del;
+				}
+			}
+		}else if ((!##ctrl) && (0x20<=##in) && (##in<=0x7e)){
 			//memo: 「ctrl+アルファベット記号」が押下されているときは無視する。
 			call _Addchar char(##in);
 		}
@@ -126,6 +142,19 @@ Process:
 
 
 Initialize:
+	return true;
+
+_CheckKeyInputTiming:
+	//キー入力するタイミングかどうか調べる
+	$$variable_name = "keydown_tickcount";
+	##share=0;
+
+	##prev = val(getstaticvariable($$variable_name, ##share ));
+	##diff = tickcount - ##prev;
+	if(##diff < #keyinput_interval){
+		return false;
+	}
+	setstaticvariable $$variable_name, str(tickcount), ##share;
 	return true;
 
 

@@ -137,6 +137,10 @@ ExecMacro:
 	$g_token[]		トークンの配列
 */
 Tokenize:
+	/*todo 後で実装する。
+	#g_token_num=split($g_token,$$1,$$2);
+	return;*/
+
 	#g_token_num=0;
 	$$token = dllfuncstr(#g_dll_dengaku,"GETTOKEN",$$1,$$2);
 	while (true) {
