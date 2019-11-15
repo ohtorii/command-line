@@ -69,80 +69,82 @@ Main:
 
 Process:
 	##in=0;
-	/*call Initialize;
-	while(##return)*/
-	{
-		call _Show;
-		if(true){
-			##in = keypressedex(1);
-		}else{
-			##in = inputchar("",10,1);
-		}
-		##ctrl =iskeydown(0x11);
-		/*if(##in!=0){
-			debuginfo 1;
-			debuginfo str(##in);
-		}*/
 
-		if(##in==0){
-			call _CheckKeyInputTiming;
-			if(##return){
-				if(iskeydown(0x24)){		//HOME
-					call _Home;
-				}else if(iskeydown(0x23)){	//END
-					call _End;
-				}else if(iskeydown(0x2E)){	//DEL
-					call _Del;
-				}
-			}
-		}else if ((!##ctrl) && (0x20<=##in) && (##in<=0x7e)){
-			//memo: 「ctrl+アルファベット記号」が押下されているときは無視する。
-			call _Addchar char(##in);
-		}
-		//カーソル移動
-		else if (##in == 0x1C)		call _Left; 	// [←]
-		else if (##in == 0x1E)		call _Right;	// [→]
-		//else if (##in == 0x1D)		call _Up;		// [↑]
-		//else if (##in == 0x1F)		call _Down; 	//[↓]
-		else if (##in == 1) 		call _Home; 	// [Ctrl-a]
-		else if (##in == 5) 		call _End;		// [Ctrl-e]
-		else if (##in == 6) 		call _Right;	// [Ctrl-f]
-		else if (##in == 2) 		call _Left; 	// [Ctrl-b]
-		//else if (##in == )		call _KillWord; 	// [M-d]	×	メタキー(ALT)を認識しない
-		//else if (##in == )		call _ForwardWord;	// [M-f]	×	メタキー(ALT)を認識しない
-		//else if (##in == )		call _BackwardWord; // [M-b]	×	メタキー(ALT)を認識しない
-
-		//履歴操作(後で実装)
-		//else if (##in == 16)		call _PreviousHistory;		// [Ctrl-p]
-		//else if (##in == 18)		call _ReverseSearchHistory; // [Ctrl-r]
-
-		//テキスト処理
-		else if (##in == 4) 		call _Del;			// [Ctrl-d]
-		else if (##in == 20)		call _Transpose;	// [Ctrl-t]
-		else if (##in == 11)		call _KillLine; 	// [Ctrl-k]
-		else if (##in == 21)		call _LineDiscard;	// [Ctrl-u]
-		else if (##in == 23)		call _WordRubout;	// [Ctrl-w]
-		else if (##in == 0x08)		call _Back; 		// [Backspace | ctrl+h]
-		else if (##in == 0x7F)		call _Del;			// [Ctrl+Backspace]
-
-		//入力文字全削除
-		// ctrl-p ctrl-nの組み合わせで利用したいので何もしない
-		//else if (##in == 14)		call _Clear;		// [Ctrl-N]
-
-		//コマンド実行
-		//else if (##in == 10){		/*call _Return;*/	return 1;}	// c-j
-		else if (##in == 13){		/*call _Return;*/}	// Enter,c-m
-		//その他
-		else if (##in == 3){		/*call _Exit;*/  }	// ctrl-c
-		else if (##in == 0x1B){ 	/*call _Escape;*/}	// [Esc]
-		call _Show;
+	call _Show;
+	if(true){
+		##in = keypressedex(1);
+	}else{
+		##in = inputchar("",10,1);
 	}
+	##ctrl =iskeydown(0x11);
+	##alt  =iskeydown(0x12);
+
+	/*if(##in!=0){
+		debuginfo sprintf("##in=0x%s; ##alt=%d", hex(##in), ##alt);
+	}*/
+	if((##in==0) || ##alt){
+		call _CheckKeyInputTiming;
+		if(##return){
+			if(iskeydown(0x24)){		//HOME
+				call _Home;
+			}else if(iskeydown(0x23)){	//END
+				call _End;
+			}else if(iskeydown(0x2E)){	//DEL
+				call _Del;
+			}
+
+			/* キーの押下の感触に違和感があるため実装は先送りにした。
+
+			if(##alt){
+				//keypressedexでメタキーを取得できないため独自に処理している。
+
+				if (iskeydown(0x44))		call _KillWord; 	// [M-d]
+				//else if (##in == )		call _ForwardWord;	// [M-f]
+				//else if (##in == )		call _BackwardWord; // [M-b]
+			}
+			*/
+		}
+	}else if ((!##ctrl) && (0x20<=##in) && (##in<=0x7e)){
+		//memo: 「ctrl+アルファベット記号」が押下されているときは無視する。
+		call _Addchar char(##in);
+	}
+	//カーソル移動
+	else if (##in == 0x1C)		call _Left; 	// [←]
+	else if (##in == 0x1E)		call _Right;	// [→]
+	//else if (##in == 0x1D)		call _Up;		// [↑]
+	//else if (##in == 0x1F)		call _Down; 	//[↓]
+	else if (##in == 1) 		call _Home; 	// [Ctrl-a]
+	else if (##in == 5) 		call _End;		// [Ctrl-e]
+	else if (##in == 6) 		call _Right;	// [Ctrl-f]
+	else if (##in == 2) 		call _Left; 	// [Ctrl-b]
+
+	//履歴操作(後で実装)
+	//else if (##in == 16)		call _PreviousHistory;		// [Ctrl-p]
+	//else if (##in == 18)		call _ReverseSearchHistory; // [Ctrl-r]
+
+	//テキスト処理
+	else if (##in == 4) 		call _Del;			// [Ctrl-d]
+	else if (##in == 20)		call _Transpose;	// [Ctrl-t]
+	else if (##in == 11)		call _KillLine; 	// [Ctrl-k]
+	else if (##in == 21)		call _LineDiscard;	// [Ctrl-u]
+	else if (##in == 23)		call _WordRubout;	// [Ctrl-w]
+	else if (##in == 0x08)		call _Back; 		// [Backspace | ctrl+h]
+	else if (##in == 0x7F)		call _Del;			// [Ctrl+Backspace]
+
+	//入力文字全削除
+	// ctrl-p ctrl-nの組み合わせで利用したいので何もしない
+	//else if (##in == 14)		call _Clear;		// [Ctrl-N]
+
+	//コマンド実行
+	//else if (##in == 10){		/*call _Return;*/	return 1;}	// c-j
+	else if (##in == 13){		/*call _Return;*/}	// Enter,c-m
+	//その他
+	else if (##in == 3){		/*call _Exit;*/  }	// ctrl-c
+	else if (##in == 0x1B){ 	/*call _Escape;*/}	// [Esc]
+	call _Show;
+
 	return ##in;
 
-
-
-Initialize:
-	return true;
 
 _CheckKeyInputTiming:
 	//キー入力するタイミングかどうか調べる
