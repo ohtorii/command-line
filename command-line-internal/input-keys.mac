@@ -83,13 +83,13 @@ Process:
 		debuginfo sprintf("##in=0x%s; ##alt=%d", hex(##in), ##alt);
 	}*/
 	if((##in==0) || ##alt){
-		call _CheckKeyInputTiming;
-		if(##return){
-			if(iskeydown(0x24)){		//HOME
+		call UpdateKeyStatus;
+		{
+			if(#g_keyprss_home){
 				call _Home;
-			}else if(iskeydown(0x23)){	//END
+			}else if(#g_keyprss_end){
 				call _End;
-			}else if(iskeydown(0x2E)){	//DEL
+			}else if(#g_keyprss_del){
 				call _Del;
 			}
 
@@ -146,8 +146,17 @@ Process:
 	return ##in;
 
 
-_CheckKeyInputTiming:
-	//キー入力するタイミングかどうか調べる
+UpdateKeyStatus:
+	/*キー入力の処理
+
+	(memo)
+	・キーリピートを自力で処理しています。
+	・見ての通りやっつけ仕事です。
+	*/
+	#g_keyprss_home		=false;
+	#g_keyprss_end		=false;
+	#g_keyprss_del		=false;
+
 	$$variable_name = "keydown_tickcount";
 	##share=0;
 
@@ -156,8 +165,19 @@ _CheckKeyInputTiming:
 	if(##diff < #keyinput_interval){
 		return false;
 	}
-	setstaticvariable $$variable_name, str(tickcount), ##share;
-	return true;
+
+	#g_keyprss_home	=iskeydown(0x24);
+	#g_keyprss_end	=iskeydown(0x23);
+	#g_keyprss_del	=iskeydown(0x2E)
+	if(	#g_keyprss_home	||
+		#g_keyprss_end	||
+		#g_keyprss_del
+	){
+		setstaticvariable $$variable_name, str(tickcount), ##share;
+		return true;
+	}
+	return false;
+
 
 
 _Addchar:
