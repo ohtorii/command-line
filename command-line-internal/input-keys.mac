@@ -168,7 +168,7 @@ UpdateKeyStatus:
 
 	#g_keyprss_home	=iskeydown(0x24);
 	#g_keyprss_end	=iskeydown(0x23);
-	#g_keyprss_del	=iskeydown(0x2E)
+	#g_keyprss_del	=iskeydown(0x2E);
 	if(	#g_keyprss_home	||
 		#g_keyprss_end	||
 		#g_keyprss_del
