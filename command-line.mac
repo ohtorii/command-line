@@ -8,7 +8,6 @@
 #g_open_newfile = false;
 #g_new_hidemaru = 0;
 #g_old_hidemaru = hidemaruhandle(0);
-#g_dll_dengaku  = 0;
 
 disablebreak;
 call Main;
@@ -21,12 +20,7 @@ Main:
 	if(##return==false){
 		return false;
 	}
-	call LoadDengakuDll;
-	if(! ##return){
-		return ;
-	}
 	call MainLoop;
-	call UnloadDengakuDll;
 	clearupdated;
 	//if(! ##result)
 	{
@@ -94,7 +88,8 @@ RunShell:
 RunHidemaruCommand:
 	//todo: 空白区切りは文字列を解析できないのでよくない。
 	//		（例）hoge.mac 1 2 "a b c";
-	call Tokenize, $$1, " ";
+	#g_token_num=split($g_token,$$1," ");
+
 	//call DumpToken;
 	if(#g_token_num==0){
 		return ;
@@ -127,35 +122,6 @@ ExecMacro:
 		execmacro $$abs_filename, $g_token[1], $g_token[2], $g_token[3], $g_token[4], $g_token[5];
 	}
 	return ;
-/*
-＊引数
-	$$1 対象文字列
-	$$2 セパレータ
-
-＊返値
-	#g_token_num	トークン数
-	$g_token[]		トークンの配列
-*/
-Tokenize:
-	/*todo 後で実装する。
-	#g_token_num=split($g_token,$$1,$$2);
-	return;*/
-
-	#g_token_num=0;
-	$$token = dllfuncstr(#g_dll_dengaku,"GETTOKEN",$$1,$$2);
-	while (true) {
-		if($$token==""){
-			return;
-		}
-		$g_token[#g_token_num] = $$token;
-		#g_token_num = #g_token_num + 1;
-	    if (dllfunc(#g_dll_dengaku,"HASMORETOKENS") == 0) {
-			return;
-		}
-	    $$token = dllfuncstr(#g_dll_dengaku,"GETTOKEN","",$$2);
-	}
-	return;
-
 
 DumpToken:
 	debuginfo "==== DumpToken ====";
@@ -196,24 +162,3 @@ CloseFileIfOpen:
 		#g_new_hidemaru=0;
 	}
 	return true;
-
-LoadDengakuDll:
-	if(#g_dll_dengaku!=0){
-		return true;
-	}
-	#g_dll_dengaku=loaddll(macrodir + "\\DengakuDLL.dll");
-	if (#g_dll_dengaku!=0) {
-		return true;
-	}
-	#g_dll_dengaku=loaddll(hidemarudir + "\\DengakuDLL.dll");
-	if (#g_dll_dengaku!=0) {
-		return true;
-	}
-	message "田楽DLLのロードに失敗しました\n" + "DengakuDLL.dllが秀丸マクロディレクトリに存在するか確認してください";
-	return false;
-
-UnloadDengakuDll:
-	if(#g_dll_dengaku!=0){
-		freedll #g_dll_dengaku;
-	}
-	return ;
