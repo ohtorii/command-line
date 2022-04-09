@@ -143,7 +143,7 @@ NewfileIfExist:
 	//編集中のテキストを上書きしないための対応。
 	//新規ファイルを作成しそこへコマンドの実行結果を出力する。
 	newfile;
-	if(result==0){
+	if(getresultex(25)){
 		return false;
 	}
 	#g_open_newfile=true;
